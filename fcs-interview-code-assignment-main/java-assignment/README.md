@@ -46,6 +46,30 @@ In this mode you can make changes to the code and have the changes immediately a
     Hot reload works even when modifying your JPA entities.
     Try it! Even the database schema will be updated on the fly.
 
+## Testing & Coverage
+
+Run the full test suite (unit tests plus `@QuarkusTest` REST-layer tests):
+
+```sh
+./mvnw test
+```
+
+Run tests **and** enforce the 80% line-coverage gate (JaCoCo, bound to the Maven `verify`
+phase - this is the same command the GitHub Actions CI workflow runs):
+
+```sh
+./mvnw verify
+```
+
+The HTML coverage report is written to `target/site/jacoco/index.html`. `mvn verify` fails the
+build if line coverage drops below 80%; generated OpenAPI code and plain data-holder classes
+(domain POJOs, JPA entities with no logic) are excluded from the ratio so the gate measures
+actual business logic, not boilerplate.
+
+The `@QuarkusTest` REST-layer tests need Docker running locally (Quarkus Dev Services spins up
+a throwaway PostgreSQL container automatically) - no manual database setup is required, just
+have Docker Desktop (or an equivalent) running before `./mvnw test`/`verify`.
+
 ## (Optional) Run Quarkus in JVM mode
 
 When you're done iterating in developer mode, you can run the application as a conventional jar file.
@@ -81,6 +105,12 @@ Navigate to:
 <http://localhost:8080/index.html>
 
 Have fun, and join the team of contributors!
+
+## CI
+
+A GitHub Actions workflow at [`/.github/workflows/ci.yml`](../../.github/workflows/ci.yml) (repo
+root, not this module - GitHub Actions only reads workflows from there) runs `./mvnw verify` on
+every push/PR to `main`, so the 80% coverage gate above is enforced automatically.
 
 ## Troubleshooting
 
