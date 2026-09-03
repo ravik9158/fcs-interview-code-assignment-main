@@ -5,7 +5,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Status;
+import jakarta.transaction.Synchronization;
 import jakarta.transaction.Transactional;
+import jakarta.transaction.TransactionSynchronizationRegistry;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -29,7 +32,26 @@ public class StoreResource {
 
   @Inject LegacyStoreManagerGateway legacyStoreManagerGateway;
 
+  @Inject TransactionSynchronizationRegistry txRegistry;
+
   private static final Logger LOGGER = Logger.getLogger(StoreResource.class.getName());
+
+  // Runs `action` only after the current transaction commits, so the legacy system never
+  // observes a Store that failed to persist.
+  private void afterCommit(Runnable action) {
+    txRegistry.registerInterposedSynchronization(
+        new Synchronization() {
+          @Override
+          public void beforeCompletion() {}
+
+          @Override
+          public void afterCompletion(int status) {
+            if (status == Status.STATUS_COMMITTED) {
+              action.run();
+            }
+          }
+        });
+  }
 
   @GET
   public List<Store> get() {
@@ -55,7 +77,7 @@ public class StoreResource {
 
     store.persist();
 
-    legacyStoreManagerGateway.createStoreOnLegacySystem(store);
+    afterCommit(() -> legacyStoreManagerGateway.createStoreOnLegacySystem(store));
 
     return Response.ok(store).status(201).build();
   }
@@ -77,7 +99,7 @@ public class StoreResource {
     entity.name = updatedStore.name;
     entity.quantityProductsInStock = updatedStore.quantityProductsInStock;
 
-    legacyStoreManagerGateway.updateStoreOnLegacySystem(updatedStore);
+    afterCommit(() -> legacyStoreManagerGateway.updateStoreOnLegacySystem(updatedStore));
 
     return entity;
   }
@@ -104,7 +126,7 @@ public class StoreResource {
       entity.quantityProductsInStock = updatedStore.quantityProductsInStock;
     }
 
-    legacyStoreManagerGateway.updateStoreOnLegacySystem(updatedStore);
+    afterCommit(() -> legacyStoreManagerGateway.updateStoreOnLegacySystem(updatedStore));
 
     return entity;
   }
