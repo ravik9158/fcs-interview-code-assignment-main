@@ -26,13 +26,13 @@ paths:
             schema:
               $ref: '#/components/schemas/Warehouse'
       responses:
-        '201':
+        '200':
           description: Warehouse unit created
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Warehouse'
-        
+
         '400':
           description: Invalid request parameters
 
