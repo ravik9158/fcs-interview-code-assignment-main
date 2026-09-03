@@ -4,6 +4,8 @@ import com.fulfilment.application.monolith.warehouses.domain.models.Warehouse;
 import com.fulfilment.application.monolith.warehouses.domain.ports.WarehouseStore;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.ws.rs.WebApplicationException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @ApplicationScoped
@@ -16,25 +18,40 @@ public class WarehouseRepository implements WarehouseStore, PanacheRepository<Db
 
   @Override
   public void create(Warehouse warehouse) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'create'");
+    DbWarehouse dbWarehouse = DbWarehouse.fromWarehouse(warehouse);
+    if (dbWarehouse.createdAt == null) {
+      dbWarehouse.createdAt = LocalDateTime.now();
+    }
+    persist(dbWarehouse);
+    warehouse.id = dbWarehouse.id;
   }
 
   @Override
   public void update(Warehouse warehouse) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'replace'");
+    DbWarehouse dbWarehouse = findById(warehouse.id);
+    if (dbWarehouse == null) {
+      throw new WebApplicationException("Warehouse not found", 404);
+    }
+    dbWarehouse.businessUnitCode = warehouse.businessUnitCode;
+    dbWarehouse.location = warehouse.location;
+    dbWarehouse.capacity = warehouse.capacity;
+    dbWarehouse.stock = warehouse.stock;
+    dbWarehouse.archivedAt = warehouse.archivedAt;
   }
 
   @Override
   public void remove(Warehouse warehouse) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'remove'");
+    DbWarehouse dbWarehouse = findById(warehouse.id);
+    if (dbWarehouse != null) {
+      delete(dbWarehouse);
+    }
   }
 
   @Override
   public Warehouse findByBusinessUnitCode(String buCode) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'findById'");
+    return find("businessUnitCode = ?1 and archivedAt is null", buCode)
+        .firstResultOptional()
+        .map(DbWarehouse::toWarehouse)
+        .orElse(null);
   }
 }
