@@ -202,12 +202,12 @@ the JaCoCo HTML report as a run artifact for tracking coverage over time.
 
 ## Screenshots
 
-_(to be added)_
-
-- A successful `POST /warehouse` request and response (from the example above), in curl or Postman.
-- A rejected request showing the JSON error shape (e.g. duplicate business unit code, 400).
-- The JaCoCo HTML report open in a browser, showing the overall coverage figure.
-- A green CI run in the GitHub Actions tab, with the JaCoCo artifact visible.
+![Screenshot 1](docs/screenshots/screenshot-1.png)
+![Screenshot 2](docs/screenshots/screenshot-2.png)
+![Screenshot 3](docs/screenshots/screenshot-3.png)
+![Screenshot 4](docs/screenshots/screenshot-4.png)
+![Screenshot 5](docs/screenshots/screenshot-5.png)
+![Screenshot 6](docs/screenshots/screenshot-6.png)
 
 ## Troubleshooting
 
