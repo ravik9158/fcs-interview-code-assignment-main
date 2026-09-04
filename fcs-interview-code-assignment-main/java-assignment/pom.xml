@@ -165,7 +165,7 @@
                                 <exclude>**/stores/Store.class</exclude>
                                 <exclude>**/products/Product.class</exclude>
                                 <exclude>**/adapters/database/DbWarehouse.class</exclude>
-                                <exclude>**/fulfillment/ProductFulfillment.class</exclude>
+                                <exclude>**/fulfillment/adapters/database/DbProductFulfillment.class</exclude>
                             </excludes>
                             <rules>
                                 <rule>

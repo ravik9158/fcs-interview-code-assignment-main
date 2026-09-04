@@ -1,4 +1,4 @@
-package com.fulfilment.application.monolith.fulfillment;
+package com.fulfilment.application.monolith.fulfillment.adapters.database;
 
 import com.fulfilment.application.monolith.products.Product;
 import com.fulfilment.application.monolith.stores.Store;
@@ -12,13 +12,13 @@ import jakarta.persistence.UniqueConstraint;
 
 // Associates a Warehouse as a fulfilment unit of a Product for a Store. Enforced quotas (max 2
 // warehouses per product per store, max 3 warehouses per store, max 5 products per warehouse)
-// live in ProductFulfillmentResource, not here - this is a plain association record.
+// live in FulfillmentValidator, not here - this is a plain association record.
 @Entity
 @Table(
     name = "product_fulfillment",
     uniqueConstraints =
         @UniqueConstraint(columnNames = {"store_id", "product_id", "warehouse_id"}))
-public class ProductFulfillment {
+public class DbProductFulfillment {
 
   @Id @GeneratedValue public Long id;
 
@@ -28,9 +28,9 @@ public class ProductFulfillment {
 
   @ManyToOne public DbWarehouse warehouse;
 
-  public ProductFulfillment() {}
+  public DbProductFulfillment() {}
 
-  public ProductFulfillment(Store store, Product product, DbWarehouse warehouse) {
+  public DbProductFulfillment(Store store, Product product, DbWarehouse warehouse) {
     this.store = store;
     this.product = product;
     this.warehouse = warehouse;
