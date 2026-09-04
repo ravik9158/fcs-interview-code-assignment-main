@@ -7,6 +7,7 @@ import com.fulfilment.application.monolith.warehouses.domain.models.Location;
 import com.fulfilment.application.monolith.warehouses.domain.models.Warehouse;
 import com.fulfilment.application.monolith.warehouses.domain.ports.LocationResolver;
 import com.fulfilment.application.monolith.warehouses.domain.ports.WarehouseStore;
+import com.fulfilment.application.monolith.warehouses.domain.validators.WarehouseValidator;
 import jakarta.ws.rs.WebApplicationException;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +52,7 @@ public class CreateWarehouseUseCaseTest {
   @BeforeEach
   public void setUp() {
     stored.clear();
-    useCase = new CreateWarehouseUseCase(warehouseStore, locationResolver);
+    useCase = new CreateWarehouseUseCase(warehouseStore, new WarehouseValidator(warehouseStore, locationResolver));
   }
 
   private Warehouse newWarehouse(String buCode, String location, int capacity, int stock) {
@@ -116,7 +117,9 @@ public class CreateWarehouseUseCaseTest {
   public void testMaxCapacityAtLocationIsEnforced() {
     var locationResolverWithRoom =
         (LocationResolver) identifier -> new Location("AMSTERDAM-001", 5, 40);
-    useCase = new CreateWarehouseUseCase(warehouseStore, locationResolverWithRoom);
+    useCase =
+        new CreateWarehouseUseCase(
+            warehouseStore, new WarehouseValidator(warehouseStore, locationResolverWithRoom));
 
     useCase.create(newWarehouse("MWH.100", "AMSTERDAM-001", 30, 5));
 

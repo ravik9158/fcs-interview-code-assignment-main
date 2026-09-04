@@ -9,6 +9,7 @@ import com.fulfilment.application.monolith.warehouses.domain.models.Location;
 import com.fulfilment.application.monolith.warehouses.domain.models.Warehouse;
 import com.fulfilment.application.monolith.warehouses.domain.ports.LocationResolver;
 import com.fulfilment.application.monolith.warehouses.domain.ports.WarehouseStore;
+import com.fulfilment.application.monolith.warehouses.domain.validators.WarehouseValidator;
 import jakarta.ws.rs.WebApplicationException;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +54,9 @@ public class ReplaceWarehouseUseCaseTest {
   @BeforeEach
   public void setUp() {
     stored.clear();
-    useCase = new ReplaceWarehouseUseCase(warehouseStore, locationResolver);
+    useCase =
+        new ReplaceWarehouseUseCase(
+            warehouseStore, new WarehouseValidator(warehouseStore, locationResolver));
   }
 
   private Warehouse existingWarehouse(String buCode, String location, int capacity, int stock) {
